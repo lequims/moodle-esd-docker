@@ -1,0 +1,50 @@
+# Archivos y carpetas de Docker
+*.log
+*.pid
+*.seed
+*.pid.lock
+docker-compose.override.yml
+
+# Volúmenes locales de Docker (no subir datos persistentes)
+moodle-data/
+moodle-db-data/
+
+# Archivos temporales y cachés
+tmp/
+temp/
+*.tmp
+*.swp
+*.swo
+*.bak
+*.old
+
+# Archivos de compilación
+*.o
+*.obj
+*.so
+*.dll
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de entornos
+.env
+.env.*
+!env.example
+
+# Configuración específica del IDE/Editor
+.vscode/
+.idea/
+*.iml
+
+# Archivos de backup
+*.tar.gz
+*.zip
+*.gz
+*.tgz
+*.bz2
+*.xz
+
+# Archivos de contenedores
+*.lock
