@@ -1,39 +1,39 @@
-name: Build and Push Moodle Docker Image to GHCR
+name: Build and Push Moodle Docker Image to GHCR (Optimitzat)
 
 on:
   push:
     branches:
-      - main  # Ejecutar en main
+      - main  # Executa només quan fem push a la branca main (producció)
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Descargar el código del repo
-      - name: Checkout repository
+      # 1. Descarregar el codi del repositori
+      - name: Checkout del repositori
         uses: actions/checkout@v3
 
-      # 2. Configurar Buildx para builds avanzados
-      - name: Set up Docker Buildx
+      # 2. Configurar Docker Buildx (necessari per fer build avançats amb cache)
+      - name: Configura Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # 3. Iniciar sesión en GHCR usando secretos personalizados
-      - name: Log in to GHCR
+      # 3. Login a GHCR utilitzant secrets
+      #    GHCR_TOKEN i GHCR_USERNAME s'han de definir a GitHub -> Settings -> Secrets -> Actions
+      - name: Inicia sessió a GHCR
         run: |
           echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} --password-stdin
 
-      # 4. Construir y publicar imagen personalizada de Moodle
-      - name: Build and Push Moodle image
-        run: |
-          IMAGE_NAME=ghcr.io/${{ secrets.GHCR_USERNAME }}/moodle-esd-docker
-          echo "Building and pushing $IMAGE_NAME"
-          docker buildx build \
-            --platform linux/amd64,linux/arm64 \
-            --file ./moodle/Dockerfile \
-            --tag $IMAGE_NAME:latest \
-            --tag $IMAGE_NAME:${{ github.sha }} \
-            --push \
-            .
-
-
+      # 4. Construir i pujar la imatge a GHCR amb cache activada
+      - name: Build i Push de la imatge de Moodle
+        uses: docker/build-push-action@v5
+        with:
+          context: .                     # Directori arrel
+          file: ./moodle/Dockerfile      # Dockerfile personalitzat
+          push: true                     # Pujar la imatge a GHCR
+          tags: |                        # Etiquetes (latest i amb SHA)
+            ghcr.io/${{ secrets.GHCR_USERNAME }}/moodle-esd-docker:latest
+            ghcr.io/${{ secrets.GHCR_USERNAME }}/moodle-esd-docker:${{ github.sha }}
+          platforms: linux/amd64         # Només AMD64 per reduir temps (sense multi-arch)
+          cache-from: type=gha           # Activem cache per reutilitzar capes entre builds
+          cache-to: type=gha,mode=max

@@ -1,9 +1,6 @@
-version: '3.8'
-
 services:
   moodle-db:
     image: mariadb:${MARIADB_VERSION}
-    container_name: moodle-db
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -11,13 +8,15 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
-      - moodle-db-data:/var/lib/mysql
+      - moodle-db:/var/lib/mysql
     networks:
       - moodle-net
 
   moodle:
-    build: ./moodle  # O usa image: moodle-docker-moodle:latest si ya la tienes
-    container_name: moodle
+    build:
+      context: ./moodle
+      args:
+        PHP_VERSION: ${PHP_VERSION}
     restart: always
     depends_on:
       - moodle-db
@@ -33,14 +32,15 @@ services:
     ports:
       - "${HTTP_PORT}:80"
     volumes:
-      - moodle-data:/var/www/html
+      - moodle-code:/var/www/html        # Codi Moodle
+      - moodle-data:/var/www/moodledata  # Fitxers moodledata
     networks:
       - moodle-net
 
 volumes:
-  moodle-db-data:
+  moodle-db:
+  moodle-code:
   moodle-data:
 
 networks:
   moodle-net:
-  
