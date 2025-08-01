@@ -19,6 +19,7 @@ services:
     restart: always
     depends_on:
       - moodle-db
+      - redis
     environment:
       MOODLE_DBTYPE: ${MOODLE_DBTYPE}
       MOODLE_DBHOST: ${MOODLE_DBHOST}
@@ -48,10 +49,20 @@ services:
     entrypoint: >
       /bin/bash -c "while true; do php /var/www/html/admin/cli/cron.php; sleep 60; done"
 
+  redis:
+    image: redis:alpine
+    restart: always
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    volumes:
+      - redis-data:/data
+    networks:
+      - moodle-net
+
 volumes:
   moodle-db:
   moodle-code:
   moodle-data:
+  redis-data:
 
 networks:
   moodle-net:
