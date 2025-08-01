@@ -15,7 +15,7 @@ services:
       - moodle-net
 
   moodle:
-    image: ghcr.io/lequims/moodle-esd-docker:latest  # Imagen en GHCR
+    image: ghcr.io/lequims/moodle-esd-docker:latest
     restart: always
     depends_on:
       - moodle-db
@@ -35,6 +35,18 @@ services:
       - moodle-data:/var/www/moodledata
     networks:
       - moodle-net
+
+  moodle-cron:
+    image: ghcr.io/lequims/moodle-esd-docker:latest
+    depends_on:
+      - moodle
+    volumes:
+      - moodle-code:/var/www/html
+      - moodle-data:/var/www/moodledata
+    networks:
+      - moodle-net
+    entrypoint: >
+      /bin/bash -c "while true; do php /var/www/html/admin/cli/cron.php; sleep 60; done"
 
 volumes:
   moodle-db:
