@@ -5,12 +5,12 @@ ARG MOODLE_VERSION=5.0.1
 ENV MOODLE_URL=https://download.moodle.org/download.php/direct/stable500/moodle-${MOODLE_VERSION}.tgz \
     MOODLE_PATH=/var/www/html
 
-# Instal·lar dependències i eines
+# Instal·lar dependències i eines necessàries
 RUN apt-get update && apt-get install -y \
-    cron nano \
+    cron nano git curl zip unzip \
     libpng-dev libjpeg-dev libfreetype6-dev \
     libicu-dev libxml2-dev libzip-dev libxslt-dev \
-    zip unzip git curl pkg-config libssl-dev gcc make autoconf \
+    pkg-config libssl-dev gcc make autoconf \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd intl zip soap mysqli pdo pdo_mysql exif \
     && pecl install redis \
@@ -20,19 +20,24 @@ RUN apt-get update && apt-get install -y \
 # Activar mod_rewrite
 RUN a2enmod rewrite
 
-# Descarregar Moodle
+# Descarregar i instal·lar Moodle
 RUN set -e \
     && mkdir -p $MOODLE_PATH \
     && curl -fSL $MOODLE_URL -o /tmp/moodle.tgz \
     && tar -xzf /tmp/moodle.tgz --strip-components=1 -C $MOODLE_PATH \
     && rm /tmp/moodle.tgz
 
-# Permisos
+# Instal·lar el plugin Redis Lock
+RUN cd $MOODLE_PATH/local \
+    && git clone https://github.com/open-lms-open-source/moodle-local_redislock redislock \
+    && chown -R www-data:www-data redislock
+
+# Ajustar permisos de Moodle i moodledata
 RUN chown -R www-data:www-data $MOODLE_PATH \
     && mkdir -p /var/www/moodledata \
     && chown -R www-data:www-data /var/www/moodledata
 
-# Configuració PHP
+# Configuració PHP i Opcache
 RUN { \
     echo "post_max_size = 128M"; \
     echo "upload_max_filesize = 128M"; \
@@ -43,6 +48,7 @@ RUN { \
     echo "opcache.memory_consumption=256"; \
     echo "opcache.max_accelerated_files=10000"; \
     echo "opcache.revalidate_freq=60"; \
+    echo "opcache.validate_timestamps=1"; \
 } > /usr/local/etc/php/conf.d/moodle.ini
 
 EXPOSE 80
