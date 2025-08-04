@@ -26,7 +26,7 @@ RUN a2enmod rewrite remoteip
 
 # Configuració mod_remoteip usant variable d'entorn
 RUN echo "RemoteIPHeader X-Forwarded-For" > /etc/apache2/conf-available/remoteip.conf \
-    && echo "RemoteIPTrustedProxy {TRUSTED_PROXY}" >> /etc/apache2/conf-available/remoteip.conf \
+    && echo "RemoteIPTrustedProxy 127.0.0.1" >> /etc/apache2/conf-available/remoteip.conf \
     && a2enconf remoteip
 
 # Descarregar i instal·lar Moodle
