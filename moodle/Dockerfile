@@ -29,9 +29,6 @@ RUN echo "RemoteIPHeader X-Forwarded-For" > /etc/apache2/conf-available/remoteip
     && echo "RemoteIPTrustedProxy {TRUSTED_PROXY}" >> /etc/apache2/conf-available/remoteip.conf \
     && a2enconf remoteip
 
-RUN echo ">> Config RemoteIPTrustedProxy = ${TRUSTED_PROXY}"
-
-
 # Descarregar i instal·lar Moodle
 RUN set -e \
     && mkdir -p $MOODLE_PATH \
