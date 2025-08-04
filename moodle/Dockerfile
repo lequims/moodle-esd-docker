@@ -22,12 +22,12 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Activar mòduls necessaris
-RUN a2enmod rewrite remoteip
+#RUN a2enmod rewrite remoteip
 
 # Configuració mod_remoteip usant variable d'entorn
-RUN echo "RemoteIPHeader X-Forwarded-For" > /etc/apache2/conf-available/remoteip.conf \
-    && echo "RemoteIPTrustedProxy ${TRUSTED_PROXY}" >> /etc/apache2/conf-available/remoteip.conf \
-    && a2enconf remoteip
+#RUN echo "RemoteIPHeader X-Forwarded-For" > /etc/apache2/conf-available/remoteip.conf \
+#    && echo "RemoteIPTrustedProxy ${TRUSTED_PROXY}" >> /etc/apache2/conf-available/remoteip.conf \
+#    && a2enconf remoteip
 
 # Descarregar i instal·lar Moodle
 RUN set -e \

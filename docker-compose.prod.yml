@@ -29,8 +29,6 @@ services:
       MOODLE_USERNAME: ${MOODLE_USERNAME}
       MOODLE_PASSWORD: ${MOODLE_PASSWORD}
       MOODLE_SITE_NAME: ${MOODLE_SITE_NAME}
-      TRUSTED_PROXY: ${TRUSTED_PROXY}
-     
     ports:
       - "${HTTP_PORT}:80"
     volumes:
