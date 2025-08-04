@@ -5,6 +5,10 @@ ARG MOODLE_VERSION=5.0.1
 ENV MOODLE_URL=https://download.moodle.org/download.php/direct/stable500/moodle-${MOODLE_VERSION}.tgz \
     MOODLE_PATH=/var/www/html
 
+# Variable per al proxy de confiança (passada via .env)
+ARG TRUSTED_PROXY
+ENV TRUSTED_PROXY=${TRUSTED_PROXY}
+
 # Instal·lar dependències i eines necessàries
 RUN apt-get update && apt-get install -y \
     cron nano git curl zip unzip \
@@ -17,8 +21,13 @@ RUN apt-get update && apt-get install -y \
     && echo "extension=redis.so" > /usr/local/etc/php/conf.d/redis.ini \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Activar mod_rewrite
-RUN a2enmod rewrite
+# Activar mòduls necessaris
+RUN a2enmod rewrite remoteip
+
+# Configuració mod_remoteip usant variable d'entorn
+RUN echo "RemoteIPHeader X-Forwarded-For" > /etc/apache2/conf-available/remoteip.conf \
+    && echo "RemoteIPTrustedProxy ${TRUSTED_PROXY}" >> /etc/apache2/conf-available/remoteip.conf \
+    && a2enconf remoteip
 
 # Descarregar i instal·lar Moodle
 RUN set -e \
