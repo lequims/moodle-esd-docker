@@ -14,26 +14,29 @@ jobs:
       - name: Checkout del repositori
         uses: actions/checkout@v3
 
-      # 2. Configurar Docker Buildx (necessari per fer build avançats amb cache)
+      # 2. Configurar Docker Buildx (necessari per builds amb cache)
       - name: Configura Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       # 3. Login a GHCR utilitzant secrets
-      #    GHCR_TOKEN i GHCR_USERNAME s'han de definir a GitHub -> Settings -> Secrets -> Actions
       - name: Inicia sessió a GHCR
         run: |
           echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} --password-stdin
 
-      # 4. Construir i pujar la imatge a GHCR amb cache activada
+      # 4. Construir i pujar la imatge a GHCR amb ARG i cache
       - name: Build i Push de la imatge de Moodle
         uses: docker/build-push-action@v5
         with:
-          context: .                     # Directori arrel
-          file: ./moodle/Dockerfile      # Dockerfile personalitzat
-          push: true                     # Pujar la imatge a GHCR
-          tags: |                        # Etiquetes (latest i amb SHA)
+          context: .                              # Directori arrel
+          file: ./moodle/Dockerfile               # Dockerfile personalitzat
+          push: true                              # Pujar la imatge a GHCR
+          tags: |                                 # Etiquetes (latest i amb SHA)
             ghcr.io/${{ secrets.GHCR_USERNAME }}/moodle-esd-docker:latest
             ghcr.io/${{ secrets.GHCR_USERNAME }}/moodle-esd-docker:${{ github.sha }}
-          platforms: linux/amd64         # Només AMD64 per reduir temps (sense multi-arch)
-          cache-from: type=gha           # Activem cache per reutilitzar capes entre builds
+          platforms: linux/amd64                  # Només AMD64 per reduir temps
+          cache-from: type=gha                    # Cache per accelerar builds
           cache-to: type=gha,mode=max
+          build-args: |                           # ARGs per la build
+            TRUSTED_PROXY=${{ secrets.TRUSTED_PROXY }}
+            PHP_VERSION=8.4
+            MOODLE_VERSION=5.0.1

@@ -6,7 +6,7 @@ ENV MOODLE_URL=https://download.moodle.org/download.php/direct/stable500/moodle-
     MOODLE_PATH=/var/www/html
 
 # Variable per al proxy de confiança (passada via .env)
-ARG TRUSTED_PROXY
+ARG TRUSTED_PROXY=127.0.0.1
 ENV TRUSTED_PROXY=${TRUSTED_PROXY}
 
 # Instal·lar dependències i eines necessàries
