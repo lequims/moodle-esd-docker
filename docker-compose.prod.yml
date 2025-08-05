@@ -15,10 +15,6 @@ services:
       - moodle-net
 
   moodle:
-    build:
-    context: .
-    args:
-      TRUSTED_PROXY: ${TRUSTED_PROXY}
     image: ghcr.io/lequims/moodle-esd-docker:latest
     restart: always
     depends_on:
@@ -41,8 +37,16 @@ services:
       - moodle-data:/var/www/moodledata
     networks:
       - moodle-net
+    command: >
+      bash -c "
+        echo 'RemoteIPHeader X-Forwarded-For' > /etc/apache2/conf-available/remoteip.conf &&
+        echo 'RemoteIPTrustedProxy ${TRUSTED_PROXY}' >> /etc/apache2/conf-available/remoteip.conf &&
+        a2enconf remoteip &&
+        apache2-foreground
+      "
 
   moodle-cron:
+    restart: always
     image: ghcr.io/lequims/moodle-esd-docker:latest
     depends_on:
       - moodle

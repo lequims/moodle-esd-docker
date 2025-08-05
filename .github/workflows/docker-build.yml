@@ -37,6 +37,5 @@ jobs:
           cache-from: type=gha                    # Cache per accelerar builds
           cache-to: type=gha,mode=max
           build-args: |                           # ARGs per la build
-            TRUSTED_PROXY=${{ secrets.TRUSTED_PROXY }}
             PHP_VERSION=8.4
             MOODLE_VERSION=5.0.1
