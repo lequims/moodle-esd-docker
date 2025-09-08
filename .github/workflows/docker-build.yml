@@ -38,4 +38,4 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |                           # ARGs per la build
             PHP_VERSION=8.4
-            MOODLE_VERSION=5.0.1
+            MOODLE_VERSION=5.0.2
