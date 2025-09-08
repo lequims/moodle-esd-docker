@@ -1,7 +1,7 @@
 ARG PHP_VERSION=8.4
 FROM php:${PHP_VERSION}-apache
 
-ARG MOODLE_VERSION=5.0.1
+ARG MOODLE_VERSION=5.0.2
 ENV MOODLE_URL=https://download.moodle.org/download.php/direct/stable500/moodle-${MOODLE_VERSION}.tgz \
     MOODLE_PATH=/var/www/html
 
